@@ -4,3 +4,5 @@ __pycache__
 
 .virtualenvwrapper
 .DS_Store
+
+dev.ini

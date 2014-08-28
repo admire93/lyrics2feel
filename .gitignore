@@ -4,3 +4,9 @@ __pycache__
 
 .virtualenvwrapper
 .DS_Store
+
+lyrics2feel/web/static/bower_components/*
+
+
+*.cfg.py
+*.egg-info

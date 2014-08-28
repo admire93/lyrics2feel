@@ -1,6 +1,6 @@
 [flask]
-
 DEBUG = True
+MP3_SCAN =
 
 [alembic]
 # path to migration scripts

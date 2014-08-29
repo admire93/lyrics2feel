@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
 
+from configparser import ConfigParser
 from logging.config import fileConfig
 
+from flask import current_app
 from flask.ext.script import Manager, prompt_bool
 from alembic.command import revision as alembic_revision
 from alembic.command import upgrade as alembic_upgrade
@@ -32,11 +34,12 @@ def read_from_ini(app):
 
 
 @Manager
-def manager(config='dev.ini'):
-    if config is not None:
-        config = os.path.abspath(config)
-        app.config['CONFIG_ABSPATH'] = config
-        read_from_ini(app)
+def manager(config):
+    if config is None:
+        config = 'dev.ini'
+    config = os.path.abspath(config)
+    app.config['CONFIG_ABSPATH'] = config
+    read_from_ini(app)
     return app
 
 
@@ -99,4 +102,4 @@ def current():
 
 manager.add_option('--config', '-c', dest='config')
 
-main = manager.run()
+main = manager.run

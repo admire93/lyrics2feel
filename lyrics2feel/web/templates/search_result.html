@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+
+{% block htmlbody %}
+<table>
+  <thead>
+    <th>제목</th>
+    <th>아티스트</th>
+    <th>앨범</th>
+  </thead>
+
+  <tbody>
+    {% for item in search -%}
+      <tr>
+        <td>
+          <a data-json="{{ dump(item) }}"
+             href="{{ url_for('.song', track_id=item['track_id']) }}">
+            {{ item['title'] }}
+          </a>
+        </td>
+        <td>{{ item['artist'] }}</td>
+        <td>{{ item['album'] }}</td>
+      </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+
+<script type="text/javscript" src="http://code.jquery.com/jquery-2.1.0.min.js">
+</script>
+{% endblock %}

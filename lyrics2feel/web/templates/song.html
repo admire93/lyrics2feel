@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+
+{% block htmlbody %}
+<h2>
+  {{ lyrics['track'] + ' - ' + lyrics['artist'] }}
+</h2>
+
+<p>
+{{ lyrics['lyrics'] }}
+</p>
+
+<form action="{{ url_for('.create_score') }}" method="POST">
+  <select name="score">
+  {% for x in range(-100, 101): -%}
+    <option value="{{ x }}" {% if x == 0 -%}selected="selected"{%- endif %}>
+      {{ x }}
+    </option>
+  {%- endfor %}
+  </select>
+  <input type="hidden" name="album" value="{{ lyrics['album'] }}" />
+  <input type="hidden" name="artist" value="{{ lyrics['artist'] }}" />
+  <input type="hidden" name="track" value="{{ lyrics['track'] }}" />
+  <input type="hidden" name="lyrics" value="{{ lyrics['lyrics'] }}" />
+  <input type="submit" value="평가하기" />
+</form>
+{% endblock %}

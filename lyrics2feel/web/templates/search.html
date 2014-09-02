@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+
+{% block htmlbody %}
+<form action="{{ url_for('.search') }}" method="GET">
+  <input type="text" name="word" />
+  <input type="submit" value="search" />
+</form>
+{% endblock %}

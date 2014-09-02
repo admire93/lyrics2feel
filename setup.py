@@ -9,7 +9,7 @@ setup(name='lyrics2feel',
       packages=find_packages(),
       install_requires=[
           'flask==0.10.1', 'flask-script==2.0.5', 'sqlalchemy==0.9.7',
-          'pytest==2.6.0', 'tox', 'alembic'
+          'pytest==2.6.0', 'tox', 'alembic', 'html5lib'
       ],
       entry_points={
           'console_scripts': 'lyrics2feel = lyrics2feel.script:main'

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import current_app, g
 from alembic.config import Config
 from alembic.script import ScriptDirectory

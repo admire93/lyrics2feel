@@ -1,3 +1,7 @@
+""":mod:`lyrics2feel.crawl` --- crawl song's lyrics from nmusic.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+"""
 import urllib.request
 import urllib.parse
 
@@ -5,27 +9,49 @@ import html5lib
 
 from html5lib import treewalkers, treebuilders
 
+
 class NmusicCrawler(object):
+    """Crawl nmusic's information.
+    """
 
     walker = treewalkers.getTreeWalker("dom")
 
+    #: search url
     url = 'http://music.naver.com/search/search.nhn?query={}'.format
 
+    #: lyrics url
     lyrics_url = 'http://music.naver.com/lyric/index.nhn?trackId={}'.format
 
     parser = html5lib.HTMLParser(tree=treebuilders.getTreeBuilder("dom"))
 
     def read_doc(self, url):
+        """Read html document from given :param url: .
+
+        :param url: url want to be readed.
+        :return: html document.
+        """
         r = urllib.request.urlopen(url)
         return self.parser.parse(r.read())
 
     def lyrics(self, nmusic_id):
+        """Get lyrics.
+
+        :param int nmusic_id: naver music id.
+        :return: lyrics of :param nmusic_id: .
+        :rtype: str
+        """
         doc = self.read_doc(self.lyrics_url(nmusic_id))
         div = self.find_by_class(doc, 'div', 'show_lyrics')
         return self.text(div)
 
 
     def search(self, word):
+        """Search naver music track id.
+
+        :param str word: song's name or artist name want to search.
+        :return: list of result.
+        :rtype: list
+        """
         l = []
         doc = self.read_doc(self.url(urllib.parse.quote(word)))
         div = self.find_by_class(doc, 'div', 'tracklist_table')[0]
@@ -54,8 +80,8 @@ class NmusicCrawler(object):
                         self.find_by_class(album[0], 'span', 'ellipsis')
                     ).strip()
             except ValueError as e:
-                pass
-            if all([title_txt, artist_txt, album_txt]):
+                track_id = None
+            if all([title_txt, artist_txt, album_txt, track_id]):
                 l.append({
                     'title': title_txt,
                     'artist': artist_txt,

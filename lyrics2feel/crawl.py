@@ -33,6 +33,7 @@ class NmusicCrawler(object):
         r = urllib.request.urlopen(url)
         return self.parser.parse(r.read())
 
+
     def lyrics(self, nmusic_id):
         """Get lyrics.
 
@@ -41,8 +42,15 @@ class NmusicCrawler(object):
         :rtype: str
         """
         doc = self.read_doc(self.lyrics_url(nmusic_id))
-        div = self.find_by_class(doc, 'div', 'show_lyrics')
-        return self.text(div)
+        l = [
+            ('lyrics', self.find_by_class(doc, 'div', 'show_lyrics')),
+            ('track', self.find_by_class(doc, 'span', 'ico_play')),
+            ('artist', self.find_by_class(doc, 'span', 'artist')),
+            ('album', self.find_by_class(doc, 'span', 'album'))
+        ]
+        for i, (k, v) in enumerate(l[:]):
+            l[i] = k, self.text(v).strip()
+        return dict(l)
 
 
     def search(self, word):
@@ -54,7 +62,11 @@ class NmusicCrawler(object):
         """
         l = []
         doc = self.read_doc(self.url(urllib.parse.quote(word)))
-        div = self.find_by_class(doc, 'div', 'tracklist_table')[0]
+        div = self.find_by_class(doc, 'div', 'tracklist_table')
+        if div:
+            div = div[0]
+        else:
+            return []
         tr = self.find_by_class(div, 'tr', '_tracklist_move')
         for t in tr:
             trackdata = t.getAttribute('trackdata')

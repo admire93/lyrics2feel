@@ -5,7 +5,7 @@ from configparser import ConfigParser
 from logging.config import fileConfig
 
 from flask import current_app
-from flask.ext.script import Manager, prompt_bool
+from flask.ext.script import Shell, Manager, prompt_bool
 from alembic.command import revision as alembic_revision
 from alembic.command import upgrade as alembic_upgrade
 from alembic.command import downgrade as alembic_downgrade
@@ -13,7 +13,7 @@ from alembic.command import history as alembic_history
 from alembic.command import branches as alembic_branch
 from alembic.command import current as alembic_current
 
-from lyrics2feel.db import get_alembic_config, get_engine, Base
+from lyrics2feel.db import get_alembic_config, get_engine, Base, session
 from lyrics2feel.web.app import app
 
 __all__ = 'manager', 'run'
@@ -99,7 +99,11 @@ def current():
     config = get_alembic_config(engine)
     return alembic_current(config)
 
+def _make_context():
+    return dict(app=app, session=session)
+
 
 manager.add_option('--config', '-c', dest='config')
+manager.add_command("shell", Shell(make_context=_make_context))
 
 main = manager.run

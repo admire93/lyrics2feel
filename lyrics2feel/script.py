@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import asyncio
 import os
 
 from configparser import ConfigParser
@@ -12,6 +13,7 @@ from alembic.command import downgrade as alembic_downgrade
 from alembic.command import history as alembic_history
 from alembic.command import branches as alembic_branch
 from alembic.command import current as alembic_current
+from konlpy.tag import Kkma
 
 from lyrics2feel.db import get_alembic_config, get_engine, Base, session
 from lyrics2feel.web.app import app
@@ -98,6 +100,26 @@ def current():
     engine = get_engine()
     config = get_alembic_config(engine)
     return alembic_current(config)
+
+
+kkma = Kkma()
+
+@asyncio.coroutine
+def lyrics_to_word(lyrics):
+    r = kkma.pos(lyrics.lyrics)
+    print('{} done.'.format(lyrics.id))
+
+
+@manager.command
+def dump_all_lyrics():
+    from lyrics2feel.word import Lyrics
+    lyricss = session.query(Lyrics)\
+              .all()
+    tasks = [asyncio.async(lyrics_to_word(lyrics)) for lyrics in lyricss]
+    loop.run_until_complete(asyncio.wait(tasks))
+    loop = asyncio.get_event_loop()
+    loop.close()
+
 
 def _make_context():
     return dict(app=app, session=session)

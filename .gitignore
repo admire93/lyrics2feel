@@ -6,6 +6,7 @@ __pycache__
 .DS_Store
 
 dev.ini
+*.ini
 
 *.db
 *.egg-info

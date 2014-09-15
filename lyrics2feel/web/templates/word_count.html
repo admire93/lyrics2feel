@@ -1,0 +1,27 @@
+{% from 'util.html' import show_pager %}
+{% extends "base.html" %}
+
+{% block htmlbody %}
+<table border="1">
+  <thead>
+    <tr>
+      <th>단어</th>
+      <th>점수</th>
+      <th>빈번도</th>
+      <th>제목 - 가수</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for w in wc -%}
+      <tr>
+        <td>{{ w.word }}</td>
+        <td>{{ w.score }}</td>
+        <td>{{ w.freq }}</td>
+        <td>{{ '{} - {}'.format(w.lyrics.track, w.lyrics.artist) }}</td>
+      </tr>
+    {%- endfor %}
+  </tbody>
+</table>
+
+{{ show_pager(url_for('.word_count'), pages) }}
+{% endblock %}

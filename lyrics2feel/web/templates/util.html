@@ -1,0 +1,17 @@
+{% macro show_pager(url_path, pages) -%}
+  <ul class="pager">
+    {% for num, pos in pages: -%}
+      {% if pos == 'c' -%}
+        <li class="current">
+          {{ num }}
+        </li>
+      {% else -%}
+        <li class="{% if pos == 'f' %}first{% elif pos == 'e' %}end{% endif %}">
+          <a href="{{ '%s?page=%d' % (url_path, num) }}">
+            {{ num }}
+          </a>
+        </li>
+      {%- endif %}
+    {%- endfor %}
+  </ul>
+{% endmacro %}

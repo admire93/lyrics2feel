@@ -15,6 +15,7 @@ from alembic.command import history as alembic_history
 from alembic.command import branches as alembic_branch
 from alembic.command import current as alembic_current
 from konlpy.tag import Kkma
+from sqlalchemy.exc import IntegrityError
 
 from lyrics2feel.db import get_alembic_config, get_engine, Base, session
 from lyrics2feel.web.app import app
@@ -114,8 +115,12 @@ def lyrics_to_word(lyrics):
     wcs = [(k[0], v) for k, v in count.items() if k[1] in want_tags]
     for wc in wcs:
         session.add(Word(word=wc[0], lyrics=lyrics, freq=wc[1]))
-    session.commit()
-    print('{} done.'.format(lyrics.id))
+    try:
+        session.commit()
+        print('{} done.'.format(lyrics.id))
+    except IntegrityError as e:
+        session.rollback()
+        print('{} failed.'.format(lyrics.id))
 
 
 @manager.command

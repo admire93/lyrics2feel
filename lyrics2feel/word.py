@@ -2,7 +2,8 @@ from re import split
 from itertools import groupby
 
 from sqlalchemy.types import Integer, Unicode, UnicodeText
-from sqlalchemy.schema import Column
+from sqlalchemy.schema import Column, ForeignKey
+from sqlalchemy.orm import relationship
 
 from .db import Base
 
@@ -15,7 +16,15 @@ class Word(Base):
 
     word = Column(Unicode, nullable=False)
 
-    score = Column(Integer)
+    freq = Column(Integer)
+
+    lyrics_id = Column(Integer, ForeignKey('lyrics.id'), nullable=False)
+
+    lyrics = relationship('Lyrics', lazy='joined')
+
+    @property
+    def score(self):
+        return self.lyrics.score
 
 
 class Lyrics(Base):

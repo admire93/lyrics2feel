@@ -3,6 +3,7 @@ import asyncio
 import os
 
 from configparser import ConfigParser
+from collections import Counter
 from logging.config import fileConfig
 
 from flask import current_app
@@ -106,7 +107,14 @@ kkma = Kkma()
 
 @asyncio.coroutine
 def lyrics_to_word(lyrics):
+    from lyrics2feel.word import Word
     r = kkma.pos(lyrics.lyrics)
+    want_tags = ['VV', 'MAG', 'NNG', 'XR', 'VA', 'MDT']
+    count = Counter(r)
+    wcs = [(k[0], v) for k, v in count.items() if k[1] in want_tags]
+    for wc in wcs:
+        session.add(Word(word=wc[0], lyrics=lyrics, freq=wc[1]))
+    session.commit()
     print('{} done.'.format(lyrics.id))
 
 
@@ -116,8 +124,8 @@ def dump_all_lyrics():
     lyricss = session.query(Lyrics)\
               .all()
     tasks = [asyncio.async(lyrics_to_word(lyrics)) for lyrics in lyricss]
-    loop.run_until_complete(asyncio.wait(tasks))
     loop = asyncio.get_event_loop()
+    loop.run_until_complete(asyncio.wait(tasks))
     loop.close()
 
 

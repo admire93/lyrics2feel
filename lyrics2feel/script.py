@@ -18,6 +18,7 @@ from konlpy.tag import Kkma
 from sqlalchemy.exc import IntegrityError
 
 from lyrics2feel.db import get_alembic_config, get_engine, Base, session
+from lyrics2feel.word import Word, Lyrics
 from lyrics2feel.web.app import app
 
 __all__ = 'manager', 'run'
@@ -108,7 +109,6 @@ kkma = Kkma()
 
 @asyncio.coroutine
 def lyrics_to_word(lyrics):
-    from lyrics2feel.word import Word
     r = kkma.pos(lyrics.lyrics)
     want_tags = ['VV', 'MAG', 'NNG', 'XR', 'VA', 'MDT']
     count = Counter(r)
@@ -125,13 +125,24 @@ def lyrics_to_word(lyrics):
 
 @manager.command
 def dump_all_lyrics():
-    from lyrics2feel.word import Lyrics
     lyricss = session.query(Lyrics)\
               .all()
     tasks = [asyncio.async(lyrics_to_word(lyrics)) for lyrics in lyricss]
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.wait(tasks))
     loop.close()
+
+
+@manager.option('--sep', dest='sep', default=',')
+@manager.option('--filename', '-f', dest='filename', default='out.csv')
+def export_to_csv(sep, filename):
+    words = session.query(Word)\
+            .order_by(Word.word)\
+	    .all()
+    o = [(w.word.strip(), str(w.score), str(w.freq),
+	  '{}-{}'.format(w.lyrics.artist, w.lyrics.track)) for w in words]
+    with open(filename, 'w') as f:
+        f.write('\n'.join([sep.join(w) for w in o]))
 
 
 def _make_context():
